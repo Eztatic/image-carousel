@@ -6,28 +6,22 @@ let intervalID = undefined;
 
 slideshow[i].classList.add("visible");
 
-const prevSlide = () => {
-  if (i === 0) {
-    i = slideshow.length - 1;
-  } else {
-    i--;
-  }
-  autoNext(false);
+const updateIndex = (step) => {
+  i = (i + step + slideshow.length) % slideshow.length;
   displaySlide(i);
 };
-
-document.querySelector(".previous").addEventListener("click", prevSlide);
 
 const nextSlide = () => {
-  if (i === slideshow.length - 1) {
-    i = 0;
-  } else {
-    i++;
-  }
-  displaySlide(i);
+  updateIndex(1);
 };
 
-document.querySelector(".next").addEventListener("click", () => {
+const prevSlide = () => {
+  autoNext(false);
+  updateIndex(-1);
+};
+
+document.querySelector("#left").addEventListener("click", prevSlide);
+document.querySelector("#right").addEventListener("click", () => {
   nextSlide();
   autoNext(true);
 });
@@ -50,7 +44,8 @@ const createDots = () => {
     dot.setAttribute("data-slide", n);
     dot.innerText = "radio_button_unchecked";
     dot.addEventListener("click", () => {
-      displaySlide(dot.getAttribute("data-slide"));
+      displaySlide(Number(dot.getAttribute("data-slide")));
+      autoNext(false);
     });
     navigationDots.appendChild(dot);
   }
@@ -59,13 +54,8 @@ const createDots = () => {
 createDots();
 
 const autoNext = (lever) => {
-  if (lever) {
-    clearInterval(intervalID);
-    intervalID = setInterval(nextSlide, 5000);
-  } else {
-    clearInterval(intervalID);
-    intervalID = undefined;
-  }
+  clearInterval(intervalID);
+  if (lever) intervalID = setInterval(nextSlide, 5000);
 };
 
 autoNext(true);
